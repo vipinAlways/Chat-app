@@ -14,7 +14,7 @@ const Page: FC<PageProps> = ({}) => {
 
   const handleLogin = () => {
     setIsLoading(true);
-    signIn("google", { callbackUrl: "/dashboard" });
+    signIn("google", { callbackUrl: "/dashboard/add" });
     
   };
   return (

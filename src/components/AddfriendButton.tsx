@@ -1,70 +1,83 @@
-"use client";
-import React, { useState } from "react";
-import { Button } from "./ui/button";
-import { addFriendValidator } from "@/lib/validators/add-friend";
-import axios, { AxiosError } from "axios";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+'use client'
 
-type FormData = z.infer<typeof addFriendValidator>;
 
-function AddfriendButton() {
-  const [showSuccess, setShowsuccess] = useState<boolean>(false);
+import axios, { AxiosError } from 'axios'
+import { FC, useState } from 'react'
+
+import { z } from 'zod'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { addFriendValidator } from '@/lib/validators/add-friend'
+import { Button } from './ui/button'
+
+interface AddFriendButtonProps {}
+
+type FormData = z.infer<typeof addFriendValidator>
+
+const AddFriendButton: FC<AddFriendButtonProps> = ({}) => {
+  const [showSuccessState, setShowSuccessState] = useState<boolean>(false)
 
   const {
     register,
     handleSubmit,
     setError,
     formState: { errors },
-  } = useForm<FormData>({ resolver: zodResolver(addFriendValidator) });
+  } = useForm<FormData>({
+    resolver: zodResolver(addFriendValidator),
+  })
 
   const addFriend = async (email: string) => {
     try {
-      const validateEmail = addFriendValidator.parse({ email });
-      await axios.post("/api/friends/add", {
-        email: validateEmail,
-      });
+      const validatedEmail = addFriendValidator.parse({ email })
 
-      setShowsuccess(true);
+      await axios.post('/api/friends/add', {
+        email: validatedEmail,
+      })
+
+      setShowSuccessState(true)
     } catch (error) {
       if (error instanceof z.ZodError) {
-        setError("email", { message: error.message });
-        return;
+        setError('email', { message: error.message })
+        return
       }
 
       if (error instanceof AxiosError) {
-        setError("email", { message: error.response?.data });
-        return;
+        setError('email', { message: error.response?.data })
+        return
       }
-      setError("email", { message: "something went wrong" });
+
+      setError('email', { message: 'Something went wrong.' })
     }
-  };
+  }
 
   const onSubmit = (data: FormData) => {
-    addFriend(data.email);
-  };
+    addFriend(data.email)
+  }
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="max-w-sm">
+    <form onSubmit={handleSubmit(onSubmit)} className='max-w-sm'>
       <label
-        htmlFor="email"
-        className="block text-sm font-medium leading-6 text-gray-900"
-      >
-        Add friend by E-mail
+        htmlFor='email'
+        className='block text-sm font-medium leading-6 text-gray-900'>
+        Add friend by E-Mail
       </label>
-      <div className="mt-2 flex gap-4">
+
+      <div className='mt-2 flex gap-4'>
         <input
-          {...register("email")}
-          type="text"
-          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-offset-indigo-600 sm:text-sm sm:left-6 "
-          placeholder="you@example.com"
+          {...register('email')}
+          type='text'
+          className='block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'
+          placeholder='you@example.com'
+          name='email'
         />
-        <Button type="submit">Add</Button>
+        <Button>Add</Button>
       </div>
-      <p className="mt-1 text-sm text-red-600">{errors.email?.message}</p>
-      {showSuccess ? <p className="mt-1 text-sm to-green-600">Friend Request sent </p> : <p></p>}
+      <p className='mt-1 text-sm text-red-600'>{errors.email?.message}</p>
+      {showSuccessState ? (
+        <p className='mt-1 text-sm text-green-600'>Friend request sent!</p>
+      ) : null}
     </form>
-  );
+  )
 }
 
-export default AddfriendButton;
+export default AddFriendButton
