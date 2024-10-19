@@ -12,12 +12,13 @@ export async function POST(req: Request) {
 
     const { email: emailToAdd } = addFriendValidator.parse(body.email);
 
-    const idToAdd = (await fetchRedis(
+    const idToAdd = await fetchRedis(
       "get",
       `user:email:${emailToAdd}`
-    )) as string;
-
-    if (!idToAdd) {
+    )
+    console.log(idToAdd.result);
+    if (!idToAdd.result) {
+      console.log("nahi mila");
       return new Response("This person does not exist.", { status: 400 });
     }
 
@@ -27,33 +28,34 @@ export async function POST(req: Request) {
       return new Response("Unauthorized", { status: 401 });
     }
 
-    if (idToAdd === session.user.id) {
+    if (idToAdd.result === session.user.id) {
       return new Response("You cannot add yourself as a friend", {
         status: 400,
       });
     }
 
-    const isAlreadyAdded = (await fetchRedis(
+    const isAlreadyAdded = await fetchRedis(
       "sismember",
-      `user:${idToAdd}:incoming_friend_requests`,
+      `user:${idToAdd.result}:incoming_friend_requests`,
       session.user.id
-    )) as 0 | 1;
+    )
+    console.log(isAlreadyAdded,'hain kya ye ');
 
-    if (isAlreadyAdded) {
+    if (isAlreadyAdded.result) {
       return new Response("Already added this user", { status: 400 });
     }
 
-    const isAlreadyFriends = (await fetchRedis(
+    const isAlreadyFriends = await fetchRedis(
       "sismember",
       `user:${session.user.id}:friends`,
-      idToAdd
-    )) as 0 | 1;
+      idToAdd.result
+    )
 
-    if (isAlreadyFriends) {
+    if (isAlreadyFriends.result) {
       return new Response("Already friends with this user", { status: 400 });
     }
 
-    await db.sadd(`user:${idToAdd}:incoming_friend_requests`, session.user.id);
+    await db.sadd(`user:${idToAdd.result}:incoming_friend_requests`, session.user.id);
 
     return new Response("OK");
   } catch (error) {
