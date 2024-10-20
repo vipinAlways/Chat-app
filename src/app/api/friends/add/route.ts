@@ -12,13 +12,9 @@ export async function POST(req: Request) {
 
     const { email: emailToAdd } = addFriendValidator.parse(body.email);
 
-    const idToAdd = await fetchRedis(
-      "get",
-      `user:email:${emailToAdd}`
-    )
-    console.log(idToAdd.result);
+    const idToAdd = await fetchRedis("get", `user:email:${emailToAdd}`);
+
     if (!idToAdd.result) {
-      console.log("nahi mila");
       return new Response("This person does not exist.", { status: 400 });
     }
 
@@ -38,8 +34,7 @@ export async function POST(req: Request) {
       "sismember",
       `user:${idToAdd.result}:incoming_friend_requests`,
       session.user.id
-    )
-    console.log(isAlreadyAdded,'hain kya ye ');
+    );
 
     if (isAlreadyAdded.result) {
       return new Response("Already added this user", { status: 400 });
@@ -49,13 +44,16 @@ export async function POST(req: Request) {
       "sismember",
       `user:${session.user.id}:friends`,
       idToAdd.result
-    )
+    );
 
     if (isAlreadyFriends.result) {
       return new Response("Already friends with this user", { status: 400 });
     }
 
-    await db.sadd(`user:${idToAdd.result}:incoming_friend_requests`, session.user.id);
+    await db.sadd(
+      `user:${idToAdd.result}:incoming_friend_requests`,
+      session.user.id
+    );
 
     return new Response("OK");
   } catch (error) {
