@@ -1,6 +1,8 @@
 import FriendRequestSidebarOptions from "@/components/FriendRequestSidebarOptions";
 import { Icon, Icons } from "@/components/Icon";
+import SideChatList from "@/components/SideChatList";
 import SignOutButton from "@/components/SignOutButton";
+import { getFriendByUserID } from "@/helpers/getFriendByUserID";
 import { fetchRedis } from "@/helpers/redis";
 import { authOptions } from "@/lib/auth";
 import { getServerSession, User } from "next-auth";
@@ -40,6 +42,9 @@ const Layout: FC<LayoutProps> = async ({ children }) => {
     `user:${session.user.id}:incoming_friend_requests`
   );
 
+  const friendsDetails = await getFriendByUserID(session.user.id);
+  const friends = friendsDetails.map((detail) => JSON.parse(detail));
+  console.log(friends);
   return (
     <div className="w-full flex h-screen">
       <div className="flex h-full w-full max-w-xs grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6">
@@ -50,9 +55,11 @@ const Layout: FC<LayoutProps> = async ({ children }) => {
           Your Chats
         </div>
 
-        <nav className="flex left-1 flex-col">
+        <nav className="flex left-1 flex-col h-full">
           <ul role="list" className="flex flex-1 flex-col gap-y-7">
-            <li>//chats that this user has</li>
+            <li>
+              <SideChatList friends={friends} />
+            </li>
 
             <li>
               <div className="text-xs font-semibold leading-6 text-gray-400">
@@ -87,7 +94,9 @@ const Layout: FC<LayoutProps> = async ({ children }) => {
                 </li>
               </ul>
             </li>
-            <li className="-mx-6 mt-auto flex items-center">
+
+
+            <li className="-mx-6 mt-auto flex items-center ">
               <div className="flex left-1 items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-gray-900">
                 <div className="relative h-8 w-8 bg-gray-50 ">
                   <Image
@@ -109,8 +118,8 @@ const Layout: FC<LayoutProps> = async ({ children }) => {
                   </span>
                 </div>
               </div>
-
               <SignOutButton className="h-full aspect-square" />
+
             </li>
           </ul>
         </nav>
