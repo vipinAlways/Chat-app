@@ -58,7 +58,7 @@ const Layout: FC<LayoutProps> = async ({ children }) => {
         <nav className="flex left-1 flex-col h-full">
           <ul role="list" className="flex flex-1 flex-col gap-y-7">
             <li>
-              <SideChatList friends={friends} />
+              <SideChatList friends={friends} sessionId={session.user.id} />
             </li>
 
             <li>
