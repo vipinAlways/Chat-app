@@ -12,7 +12,7 @@ interface User {
   
   interface Message {
     id: string
-    senderId: string
+    senderID: string
     // receiverId: string
     text: string
     timestamp: number

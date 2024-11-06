@@ -1,3 +1,4 @@
+"use server";
 import { fetchRedis } from "@/helpers/redis";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -15,13 +16,15 @@ export async function POST(req: NextRequest) {
 
     const [userId1, userId2] = chatId.split("--");
 
-    if (session?.user.id !== userId1 && session.user.id !== userId2) {return NextResponse.json("unauthorized", { status: 401 });}
+    if (session?.user.id !== userId1 && session.user.id !== userId2) {
+      return NextResponse.json("unauthorized", { status: 401 });
+    }
 
     const friendId = session.user.id === userId1 ? userId2 : userId1;
-    const friendlist = (await fetchRedis(
+    const friendlist = await fetchRedis(
       "smembers",
       `user:${session.user.id}:friends`
-    )) 
+    );
     console.log(friendlist.result, "check this out");
 
     const isFriends = friendlist.result.includes(friendId);
@@ -33,35 +36,29 @@ export async function POST(req: NextRequest) {
     const sender = await fetchRedis("get", `user:${session.user.id}`);
 
     const parseSender = JSON.parse(sender.result) as User;
-    const timestamp:number =  Date.now()
-    console.log(typeof timestamp,'ye hain tiem ');
+    const timestamp: number = Date.now();
+    console.log(typeof timestamp, "ye hain tiem ");
     console.log(parseSender);
     const messageData: Message = {
       id: nanoid(),
-      senderId: session.user.id,
+      senderID: session.user.id,
       text,
-      timestamp
-      
+      timestamp,
     };
-
-    console.log( messageData);
 
     const message = messageValidator.parse(messageData);
 
-    console.log(message);
     await db.zadd(`chat:${chatId}:messages`, {
       score: timestamp,
       member: JSON.stringify(message),
     });
 
-
-    return new NextResponse('ok')
+    return new NextResponse("ok");
   } catch (error) {
     if (error instanceof Error) {
       console.log(error);
-      return new NextResponse(error.message,{status:500})
+      return new NextResponse(error.message, { status: 500 });
     }
-    return new NextResponse('internal server issue',{status:500})
-
+    return new NextResponse("internal server issue", { status: 500 });
   }
 }

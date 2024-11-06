@@ -1,29 +1,47 @@
 "use client";
-import { cn } from "@/lib/utils";
+import { cn, topusherKey } from "@/lib/utils";
 import { Message } from "@/lib/validators/message";
 import { timeStamp } from "console";
-import React, { FC, useRef, useState } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import { format } from "date-fns";
 import Image from "next/image";
 import { User } from "next-auth";
+import { pusherClient } from "@/lib/pusher";
 
 interface MessageProps {
   initialMessages: Message[];
   sessionId: string;
   sessionImg: string | undefined;
   chatPartner: User;
+  chatId: string;
 }
 const Messages: FC<MessageProps> = ({
   initialMessages,
   sessionId,
   sessionImg,
   chatPartner,
+  chatId,
 }) => {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const scrollDownRef = useRef<HTMLDivElement | null>(null);
   const formateTimestamp = (timestamp: number) => {
     return format(timestamp, "HH:mm");
   };
+
+  useEffect(() => {
+    pusherClient.subscribe(topusherKey(`chat:${chatId}`));
+    const messageHandler = (message:Message) => {
+      setMessages((prev) => [message, ...prev]);
+    };
+
+    pusherClient.bind("incoming-message", messageHandler);
+
+    return () => {
+      pusherClient.unsubscribe(topusherKey(`chat:${chatId}`));
+
+      pusherClient.unbind("incoming-message", messageHandler);
+    };
+  }, []);
   return (
     <div
       id="messages"
@@ -32,10 +50,10 @@ const Messages: FC<MessageProps> = ({
       <div ref={scrollDownRef}></div>
 
       {messages.map((message, index) => {
-        const isCurrentUSer = message.senderId === sessionId;
+        const isCurrentUSer = message.senderID === sessionId;
 
         const hasNextMessagesFromSameUser =
-          messages[index - 1]?.senderId === messages[index].senderId;
+          messages[index - 1]?.senderID === messages[index].senderID;
         return (
           <div key={`${message.id}-${message.timestamp}`}>
             <div

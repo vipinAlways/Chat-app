@@ -1,9 +1,10 @@
 "use client";
+import { pusherClient } from "@/lib/pusher";
+import { topusherKey } from "@/lib/utils";
 import axios from "axios";
-import { Check,  UserPlus, X } from "lucide-react";
+import { Check, UserPlus, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { FC, useState } from "react";
-
+import React, { FC, useEffect, useState } from "react";
 
 interface FriendRequestProps {
   incomingFriendRequests: IncomingFriendRequest[];
@@ -16,24 +17,49 @@ const FriendRequests: FC<FriendRequestProps> = ({
   const [friendRequest, setFriendRequest] = useState<IncomingFriendRequest[]>(
     incomingFriendRequests
   );
-  const router = useRouter()
+  const router = useRouter();
 
-  const acceptFriend = async (senderId: string) => {
-    await axios.post('/api/friends/accept', { id: senderId })
+  useEffect(() => {
+    pusherClient.subscribe(
+      topusherKey(`user:${sessionID}:incoming_friend_requests`)
+    );
+    const friendRequestHanlder = ({
+      senderID,
+      senderEmail,
+    }: IncomingFriendRequest) => {
+      setFriendRequest((prev) => [...prev, { senderID, senderEmail }]);//what is this 
+    };
+
+    pusherClient.bind("incoming_friend_requests", friendRequestHanlder);
+
+    return () => {
+      pusherClient.unsubscribe(
+        topusherKey(`user:${sessionID}:incoming_friend_requests`)
+      );
+
+      pusherClient.unbind("incoming_friend_requests", friendRequestHanlder);
+    };
+  }, []);
+
+  const acceptFriend = async (senderID: string) => {
+    await axios.post("/api/friends/accept", { id: senderID });
 
     setFriendRequest((prev) =>
-      prev.filter((request) => request.senderID !== senderId)
-    )
+      prev.filter((request) => request.senderID !== senderID)
+    );
 
-    router.refresh()
-  }
-  const denyFriend = async (senderID:string)=>{
-    await axios.post('/api/request/deny',{id:senderID})
+    router.refresh();
+  };
+  const denyFriend = async (senderID: string) => {
+    await axios.post("/api/request/deny", { id: senderID });
 
-    setFriendRequest((prev)=>prev.filter((request)=>request.senderID !== senderID))
+    setFriendRequest((prev) =>
+      prev.filter((request) => request.senderID !== senderID)
+    );
 
-    router.refresh()
-  }
+    router.refresh();
+  };
+  
   return (
     <div>
       {friendRequest.length === 0 ? (
@@ -49,11 +75,14 @@ const FriendRequests: FC<FriendRequestProps> = ({
             <button
               aria-label="acceptFriend"
               className="w-8 h-8 bg-indigo-600 hover:bg-indigo-700 grid place-items-center rounded-full transition hover:shadow-md text-white p-1.5"
-                onClick={()=>acceptFriend(request.senderID)}
+              onClick={() => acceptFriend(request.senderID)}
             >
               <Check className="font-semibold text-white w-3/4 h-3/4" />
             </button>
-            <button aria-label="deny-friend" className="w-8 h-8 bg-red-600 hover:bg-red-700 grid place-items-center rounded-full transition hover:shadow-md text-white p-1.5">
+            <button
+              aria-label="deny-friend"
+              className="w-8 h-8 bg-red-600 hover:bg-red-700 grid place-items-center rounded-full transition hover:shadow-md text-white p-1.5"
+            >
               <X className="font-semibold text-white w-3/4 h-3/4" />
             </button>
           </div>

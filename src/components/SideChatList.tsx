@@ -15,16 +15,17 @@ const SideChatList: FC<SideChatListProps> = ({ friends, sessionId }) => {
   useEffect(() => {
     if (pathName?.includes("chat")) {
       setunSeenMessages((prev) => {
-        return prev.filter((msg) => !pathName.includes(msg.senderId));
+        return prev.filter((msg) => !pathName.includes(msg.senderID));
       });
     }
+
   }, [pathName]);
   return (
     <div>
       <ul role="list" className="max-h-[25rem] overflow-auto -mx-2 space-y-1">
         {friends.sort().map((friend) => {
           const unseenMessageCount = unSeenMessages.filter((unSeenMsg) => {
-            return unSeenMsg.senderId === friend.id;
+            return unSeenMsg.senderID === friend.id;
           }).length;
           return (
             <li key={friend.id}>
