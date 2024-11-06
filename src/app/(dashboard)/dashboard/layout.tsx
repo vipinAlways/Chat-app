@@ -44,7 +44,7 @@ const Layout: FC<LayoutProps> = async ({ children }) => {
 
   const friendsDetails = await getFriendByUserID(session.user.id);
   const friends = friendsDetails.map((detail) => JSON.parse(detail));
-  console.log(friends);
+  // console.log(friends);
   return (
     <div className="w-full flex h-screen">
       <div className="flex h-full w-full max-w-xs grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6">

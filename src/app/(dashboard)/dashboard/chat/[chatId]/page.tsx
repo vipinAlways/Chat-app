@@ -1,3 +1,4 @@
+import ChatInput from "@/components/ChatInput";
 import Messages from "@/components/Messages";
 import { fetchRedis } from "@/helpers/redis";
 import { authOptions } from "@/lib/auth";
@@ -41,14 +42,14 @@ const page: FC<pageProps> = async ({ params }) => {
     notFound();
   }
 
-  const chatpartnerID = user.id === userId1 ? userId1 : userId2;
+  const chatpartnerID = user.id === userId1 ? userId2 : userId1;
   const chatPartnerRaw = (await fetchRedis(
     'get',
     `user:${chatpartnerID}`
   )) 
-console.log(chatPartnerRaw);
+
   const chatPartner = JSON.parse(chatPartnerRaw.result ) as User;
-  console.log( chatPartner.email,'ye h ajin jo hain');
+  
   const initialmessages = await getChatMessages(chatId);
 
   return (
@@ -77,7 +78,9 @@ console.log(chatPartnerRaw);
           </div>
         </div>
       </div>
-      <Messages initialMessages={initialmessages} sessionId={session.user.id}/>
+      <Messages chatPartner={chatPartner} sessionImg={session.user.image!} initialMessages={initialmessages} sessionId={session.user.id}/>
+
+      <ChatInput chatPartner={chatPartner} chatId={chatId}/>
     </div>
   );
 };
