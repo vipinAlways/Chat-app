@@ -20,11 +20,11 @@ const SideChatList: FC<SideChatListProps> = ({ friends, sessionId }) => {
   const pathName = usePathname();
   const [unSeenMessages, setunSeenMessages] = useState<Message[]>([]);
   const { toast } = useToast();
-  const newFriendHanlder = () => {
-    router.refresh();
-  };
-
+  
   useEffect(() => {
+    const newFriendHanlder = () => {
+      router.refresh();
+    };
     pusherClient.subscribe(topusherKey(`user:${sessionId}:chats`));
 
     pusherClient.subscribe(topusherKey(`user:${sessionId}:friends`));
@@ -67,7 +67,7 @@ const SideChatList: FC<SideChatListProps> = ({ friends, sessionId }) => {
 
       pusherClient.unsubscribe(topusherKey(`user:${sessionId}:friends`));
     };
-  }, [pathName]);
+  }, [pathName,router,sessionId,toast]);
 
   useEffect(() => {
     if (pathName?.includes("chat")) {

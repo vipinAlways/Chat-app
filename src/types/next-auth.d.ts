@@ -1,4 +1,4 @@
-import type { Session,User } from "next-auth"
+import type { User } from "next-auth"
 import { User } from "next-auth"
 
 

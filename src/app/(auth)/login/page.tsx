@@ -1,16 +1,16 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
+
 import { Loader2 } from "lucide-react";
 import { signIn } from "next-auth/react";
-import { FC, useState } from "react";
+import {  useState } from "react";
 import React from "react";
 
-interface PageProps {}
 
-const Page: FC<PageProps> = ({}) => {
+
+const Page = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const {toast}  = useToast()
+
 
   const handleLogin = () => {
     setIsLoading(true);

@@ -3,7 +3,7 @@ import { fetchRedis } from "@/helpers/redis";
 import { authOptions } from "@/lib/auth";
 import { getServerSession, User } from "next-auth";
 import { notFound } from "next/navigation";
-import React, { FC } from "react";
+import React from "react";
 
 const page = async () => {
   const session = await getServerSession(authOptions);

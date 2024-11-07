@@ -5,7 +5,7 @@ import SignOutButton from "@/components/SignOutButton";
 import { getFriendByUserID } from "@/helpers/getFriendByUserID";
 import { fetchRedis } from "@/helpers/redis";
 import { authOptions } from "@/lib/auth";
-import { getServerSession, User } from "next-auth";
+import { getServerSession } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";

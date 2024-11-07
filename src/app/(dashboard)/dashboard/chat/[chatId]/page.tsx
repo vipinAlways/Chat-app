@@ -2,7 +2,6 @@ import ChatInput from "@/components/ChatInput";
 import Messages from "@/components/Messages";
 import { fetchRedis } from "@/helpers/redis";
 import { authOptions } from "@/lib/auth";
-import { db } from "@/lib/db";
 import { messageArrayValidator } from "@/lib/validators/message";
 import { getServerSession, User } from "next-auth";
 import Image from "next/image";
@@ -16,6 +15,8 @@ interface pageProps {
 }
 
 async function getChatMessages(chatId: string) {
+
+  await new Promise((resolve)=>setTimeout(resolve,2000))
   try {
     const respo = await fetchRedis("zrange", `chat:${chatId}:messages`, 0, -1);
 
@@ -27,6 +28,7 @@ async function getChatMessages(chatId: string) {
 
     return messges;
   } catch (error) {
+    console.log(error);
     notFound();
   }
 }

@@ -46,13 +46,14 @@ export async function POST(req: NextRequest) {
       senderID: session.user.id,
       text,
       timestamp,
+      receiverId:''
     };
 
     const message = messageValidator.parse(messageData);
 
     await pusherServer.trigger(
       topusherKey(`chat:${chatId}`),
-      "incoming-message",
+      "incoming-message", 
       message
     );
 

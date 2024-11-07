@@ -39,7 +39,7 @@ const FriendRequests: FC<FriendRequestProps> = ({
 
       pusherClient.unbind("incoming_friend_requests", friendRequestHanlder);
     };
-  }, []);
+  }, [sessionID]);
 
   const acceptFriend = async (senderID: string) => {
     await axios.post("/api/friends/accept", { id: senderID });
@@ -82,6 +82,7 @@ const FriendRequests: FC<FriendRequestProps> = ({
             <button
               aria-label="deny-friend"
               className="w-8 h-8 bg-red-600 hover:bg-red-700 grid place-items-center rounded-full transition hover:shadow-md text-white p-1.5"
+              onClick={()=>denyFriend(request.senderID)}
             >
               <X className="font-semibold text-white w-3/4 h-3/4" />
             </button>

@@ -1,7 +1,6 @@
 "use client";
 import { cn, topusherKey } from "@/lib/utils";
 import { Message } from "@/lib/validators/message";
-import { timeStamp } from "console";
 import React, { FC, useEffect, useRef, useState } from "react";
 import { format } from "date-fns";
 import Image from "next/image";
@@ -41,7 +40,7 @@ const Messages: FC<MessageProps> = ({
 
       pusherClient.unbind("incoming-message", messageHandler);
     };
-  }, []);
+  }, [chatId]);
   return (
     <div
       id="messages"

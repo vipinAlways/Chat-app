@@ -32,6 +32,7 @@ const ChatInput: FC<chatInputPartner> = ({ chatPartner, chatId }) => {
         textAreaRef.current?.focus();
       }
     } catch (error) {
+      console.log(error);
       toast({
         title: "Somthing Went Wrong",
         description: "error while sending messages",

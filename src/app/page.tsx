@@ -1,7 +1,7 @@
 "use client";
-import { signIn } from "next-auth/react";
 
-export default async function Home() {
+
+export default  function Home() {
   return (
     <div>
      
