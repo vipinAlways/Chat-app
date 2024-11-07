@@ -31,7 +31,7 @@ const Messages: FC<MessageProps> = ({
   useEffect(() => {
     pusherClient.subscribe(topusherKey(`chat:${chatId}`));
     const messageHandler = (message:Message) => {
-      setMessages((prev) => [message, ...prev]);
+      setMessages((prev) => [message, ...prev]);//this what do 
     };
 
     pusherClient.bind("incoming-message", messageHandler);
@@ -45,7 +45,7 @@ const Messages: FC<MessageProps> = ({
   return (
     <div
       id="messages"
-      className="flex h-full flex-1 flex-col-reverse gap-4 p-3 overflow-y-auto scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-w-2 scrolling-touch"
+      className="flex h-full flex-1 flex-col-reverse gap-4 p-3 overflow-y-auto overflow-x-hidden scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-w-2 scrolling-touch"
     >
       <div ref={scrollDownRef}></div>
 
@@ -61,7 +61,7 @@ const Messages: FC<MessageProps> = ({
             >
               <div
                 className={cn(
-                  "flex flex-col space-y-2 text-base max-w-xs mx-2",
+                  "flex flex-col space-y-2 text-base max-w-xs mx-2 h-fit",
                   {
                     "order-1 items-end": isCurrentUSer,
                     "order-2 items-start": !isCurrentUSer,
@@ -69,7 +69,7 @@ const Messages: FC<MessageProps> = ({
                 )}
               >
                 <span
-                  className={cn("px-4 py-2 rounded-lg inline-block", {
+                  className={cn("px-4 py-2 rounded-lg  whitespace-normal break-words text-wrap inline-block max-w-xs max-h-80 overflow-y-auto", {
                     "bg-indigo-600 text-white": isCurrentUSer,
                     "bg-gray-200 text-gray-900": !isCurrentUSer,
                     "rounded-br-none":
