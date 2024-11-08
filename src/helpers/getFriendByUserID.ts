@@ -1,4 +1,4 @@
-'use server'
+
 
 import { fetchRedis } from "./redis";
 

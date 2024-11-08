@@ -25,19 +25,19 @@ const ChatInput: FC<chatInputPartner> = ({ chatPartner, chatId }) => {
     }
     setLoading(true);
     try {
-      
       if (input !== "") {
         await axios.post("/api/message/send", { text: input, chatId });
         setInput("");
         textAreaRef.current?.focus();
       }
     } catch (error) {
-      console.log(error);
-      toast({
-        title: "Somthing Went Wrong",
-        description: "error while sending messages",
-        variant: "destructive",
-      });
+      if (error) {
+        toast({
+          title: "Somthing Went Wrong",
+          description: "error while sending messages",
+          variant: "destructive",
+        });
+      }
     } finally {
       setLoading(false);
     }

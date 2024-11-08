@@ -3,6 +3,7 @@ import { useToast } from "@/hooks/use-toast";
 import { pusherClient } from "@/lib/pusher";
 import { chatHrefConstructor, topusherKey } from "@/lib/utils";
 import { ToastAction } from "@radix-ui/react-toast";
+
 import { usePathname, useRouter } from "next/navigation";
 import React, { FC, useEffect, useState } from "react";
 
@@ -20,7 +21,7 @@ const SideChatList: FC<SideChatListProps> = ({ friends, sessionId }) => {
   const pathName = usePathname();
   const [unSeenMessages, setunSeenMessages] = useState<Message[]>([]);
   const { toast } = useToast();
-  
+
   useEffect(() => {
     const newFriendHanlder = () => {
       router.refresh();
@@ -32,31 +33,32 @@ const SideChatList: FC<SideChatListProps> = ({ friends, sessionId }) => {
       const shouldNotify =
         pathName !==
         `/dashboard/chat/${chatHrefConstructor(sessionId, message.senderID)}`;
-      const shouldNotify2 =
-        pathName !==
-        `/dashboard/chat/${chatHrefConstructor(message.senderID, sessionId)}`;
 
-      if (shouldNotify || shouldNotify2) {
+      if (shouldNotify) {
+        setunSeenMessages((prev) => [...prev, message]); //what does this meens
         toast({
           title: "UnseenMessage",
           description: `${message.senderName}:${message.text.slice(0, 20)} ${
             message.text.length > 20 ? "..." : ""
           }`,
-          action:<ToastAction altText="reidrect to chat" onClick={()=>{
-               router.replace(  
-              `/dashboard/chat/${chatHrefConstructor(
+          action: (
+            <a
+              href={`/dashboard/chat/${chatHrefConstructor(
                 sessionId,
                 message.senderID
-              )}`
-            );
-          }}
-          className="bg-black text-slate-100 rounded-lg p-2 "
-          >Go to chat</ToastAction>
-          
+              )}`}
+            >
+              <ToastAction
+                altText="reidrect to chat"
+                className="bg-black text-slate-100 rounded-lg p-2 "
+              >
+                Chat
+              </ToastAction>
+            </a>
+          ),
         });
-        setunSeenMessages((prev) => [...prev, message]); //what does this meens
       } else {
-        return;
+        return ''
       }
     };
     pusherClient.bind("new-message", chatHandler);
@@ -66,8 +68,11 @@ const SideChatList: FC<SideChatListProps> = ({ friends, sessionId }) => {
       pusherClient.unsubscribe(topusherKey(`user:${sessionId}:chats`));
 
       pusherClient.unsubscribe(topusherKey(`user:${sessionId}:friends`));
+
+      pusherClient.unbind("new-message", chatHandler);
+      pusherClient.unbind("new-message", newFriendHanlder);
     };
-  }, [pathName,router,sessionId,toast]);
+  }, [pathName, router, sessionId, toast]);
 
   useEffect(() => {
     if (pathName?.includes("chat")) {
@@ -75,7 +80,7 @@ const SideChatList: FC<SideChatListProps> = ({ friends, sessionId }) => {
         return prev.filter((msg) => !pathName.includes(msg.senderID));
       });
     }
-  }, [pathName,sessionId,router]);
+  }, [pathName, sessionId, router]);
   return (
     <div>
       <ul role="list" className="max-h-[25rem] overflow-auto -mx-2 space-y-1">

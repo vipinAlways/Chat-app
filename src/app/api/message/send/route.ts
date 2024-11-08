@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
       "smembers",
       `user:${session.user.id}:friends`
     );
-    console.log(friendlist.result, "check this out");
+    
 
     const isFriends = friendlist.result.includes(friendId);
 
@@ -39,8 +39,8 @@ export async function POST(req: NextRequest) {
 
     const parseSender = JSON.parse(sender.result) as User;
     const timestamp: number = Date.now();
-    console.log(typeof timestamp, "ye hain tiem ");
-    // console.log(parseSender);
+ 
+   
     const messageData: Message = {
       id: nanoid(),
       senderID: session.user.id,
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
     return new NextResponse("ok");
   } catch (error) {
     if (error instanceof Error) {
-      console.log(error);
+      
       return new NextResponse(error.message, { status: 500 });
     }
     return new NextResponse("internal server issue", { status: 500 });

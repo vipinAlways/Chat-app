@@ -15,8 +15,7 @@ interface pageProps {
 }
 
 async function getChatMessages(chatId: string) {
-
-  await new Promise((resolve)=>setTimeout(resolve,2000))
+  await new Promise((resolve) => setTimeout(resolve, 2000));
   try {
     const respo = await fetchRedis("zrange", `chat:${chatId}:messages`, 0, -1);
 
@@ -28,8 +27,9 @@ async function getChatMessages(chatId: string) {
 
     return messges;
   } catch (error) {
-    console.log(error);
-    notFound();
+    if (error) {
+      notFound();
+    }
   }
 }
 const page: FC<pageProps> = async ({ params }) => {
@@ -45,13 +45,10 @@ const page: FC<pageProps> = async ({ params }) => {
   }
 
   const chatpartnerID = user.id === userId1 ? userId2 : userId1;
-  const chatPartnerRaw = (await fetchRedis(
-    'get',
-    `user:${chatpartnerID}`
-  )) 
+  const chatPartnerRaw = await fetchRedis("get", `user:${chatpartnerID}`);
 
-  const chatPartner = JSON.parse(chatPartnerRaw.result ) as User;
-  
+  const chatPartner = JSON.parse(chatPartnerRaw.result) as User;
+
   const initialmessages = await getChatMessages(chatId);
 
   return (
@@ -61,28 +58,35 @@ const page: FC<pageProps> = async ({ params }) => {
           <div className=" relative">
             <div className=" relative w-8 sm:w-12 h-8 sm:h-12">
               <Image
-              fill
-              referrerPolicy="no-referrer"
-              src={chatPartner.image!}
-              alt={`${chatPartner.name} profile picture`}
-              className="rounded-full"
+                fill
+                referrerPolicy="no-referrer"
+                src={chatPartner.image!}
+                alt={`${chatPartner.name} profile picture`}
+                className="rounded-full"
               />
-
             </div>
           </div>
 
           <div className="flex flex-col leading-tight">
             <div className=" text-xl flex items-center">
-              <span className="text-gray-700 mr-2 font-semibold">{chatPartner.name}</span>
+              <span className="text-gray-700 mr-2 font-semibold">
+                {chatPartner.name}
+              </span>
             </div>
 
             <span className="text-sm text-gray-600">{chatPartner.email}</span>
           </div>
         </div>
       </div>
-      <Messages chatId={chatId} chatPartner={chatPartner} sessionImg={session.user.image!} initialMessages={initialmessages} sessionId={session.user.id}/>
+      <Messages
+        chatId={chatId}
+        chatPartner={chatPartner}
+        sessionImg={session.user.image!}
+        initialMessages={initialmessages ?? []}
+        sessionId={session.user.id}
+      />
 
-      <ChatInput chatPartner={chatPartner} chatId={chatId}/>
+      <ChatInput chatPartner={chatPartner} chatId={chatId} />
     </div>
   );
 };

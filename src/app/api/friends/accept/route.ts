@@ -1,6 +1,9 @@
+"use server";
 import { fetchRedis } from "@/helpers/redis";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { pusherServer } from "@/lib/pusher";
+import { topusherKey } from "@/lib/utils";
 import { getServerSession } from "next-auth";
 import { z } from "zod";
 
@@ -33,6 +36,12 @@ export async function POST(req: Request) {
     if (!hasFriendRequest.result) {
       return new Response("No friend request", { status: 404 });
     }
+
+    pusherServer.trigger(
+      topusherKey(`user:${idToAdd}:friends`),
+      'new-friend',
+      {}
+    )
 
     await db.sadd(`user:${session.user.id}:friends`, idToAdd);
     await db.sadd(`user:${idToAdd}:friends`, session.user.id);

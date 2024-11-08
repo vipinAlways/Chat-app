@@ -1,5 +1,6 @@
 import FriendRequestSidebarOptions from "@/components/FriendRequestSidebarOptions";
 import { Icon, Icons } from "@/components/Icon";
+import MobileChatLaout from "@/components/MobileChatLaout";
 import SideChatList from "@/components/SideChatList";
 import SignOutButton from "@/components/SignOutButton";
 import { getFriendByUserID } from "@/helpers/getFriendByUserID";
@@ -47,7 +48,10 @@ const Layout: FC<LayoutProps> = async ({ children }) => {
 
   return (
     <div className="w-full flex h-screen">
-      <div className="flex h-full w-full max-w-xs grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6">
+      <div className="md:hidden">
+    <MobileChatLaout friends={friends} session={session} sidebarOptions={sideBarOptions} unseenRequestCount={unseenRequestCount} />
+      </div>
+      <div className="hidden md:flex h-full w-full max-w-xs grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6">
         <Link href="/dashboard" className="h-16 shrink-0 flex items-center">
           <Icons.Logo className="h-8 w-auto text-indigo-600" />
         </Link>
